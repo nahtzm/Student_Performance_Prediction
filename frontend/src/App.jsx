@@ -1,45 +1,63 @@
 import React, { useState } from 'react';
-import { Layout, Card, Button, Typography, Space, message } from 'antd';
+import { Form, InputNumber, Button, Card, Typography, Select, Space, message } from 'antd';
 import axios from 'axios';
 
-const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
 
-function App() {
+const App = () => {
   const [loading, setLoading] = useState(false);
+  const [prediction, setPrediction] = useState(null);
 
-  const testBackend = async () => {
+  const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Gọi thử đến Backend Python đang chạy ở Port 8000
-      const response = await axios.get('http://127.0.0.1:8000/health');
-      message.success('Kết nối Backend thành công: ' + response.data.message);
+      // Gửi dữ liệu sang Backend FastAPI
+      const response = await axios.post('http://127.0.0.1:8000/predict', values);
+      setPrediction(response.data.prediction);
+      message.success('Đã dự đoán xong!');
     } catch (error) {
-      message.error('Chưa kết nối được Backend. Kiểm tra lại Terminal uvicorn nhé!');
+      message.error('Không kết nối được với Backend!');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
-      <Header style={{ background: '#001529', padding: '0 20px' }}>
-        <Title level={3} style={{ color: 'white', margin: '15px 0' }}>Đồ Án Nhóm 9</Title>
-      </Header>
-      <Content style={{ padding: '50px', display: 'flex', justifyContent: 'center' }}>
-        <Card style={{ width: 450, borderRadius: '12px', textAlign: 'center' }}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Title level={2}>Dự Đoán Kết Quả</Title>
-            <Text type="secondary">Chào Khoa, đây là giao diện kết nối thử nghiệm FE và BE.</Text>
-            <Button type="primary" size="large" onClick={testBackend} loading={loading} block>
-              Bấm để kết nối thử với Backend
+    <div style={{ padding: '50px', display: 'flex', justifyContent: 'center', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      <Card style={{ width: 500, borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <Title level={3} style={{ textAlign: 'center', color: '#1890ff' }}>Dự Đoán Kết Quả Học Tập</Title>
+        <Text type="secondary" style={{ display: 'block', marginBottom: '20px', textAlign: 'center' }}>
+          Nhập thông tin sinh viên để hệ thống AI phân tích
+        </Text>
+
+        <Form layout="vertical" onFinish={onFinish}>
+          <Form.Item label="Số giờ học/tuần" name="study_hours" rules={[{ required: true, message: 'Vui lòng nhập số giờ!' }]}>
+            <InputNumber min={0} max={168} style={{ width: '100%' }} placeholder="Ví dụ: 20" />
+          </Form.Item>
+
+          <Form.Item label="Điểm trung bình hiện tại" name="previous_score" rules={[{ required: true, message: 'Vui lòng nhập điểm!' }]}>
+            <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="Ví dụ: 7.5" />
+          </Form.Item>
+
+          <Form.Item label="Tỷ lệ chuyên cần (%)" name="attendance" rules={[{ required: true, message: 'Vui lòng nhập tỷ lệ!' }]}>
+            <InputNumber min={0} max={100} style={{ width: '100%' }} placeholder="Ví dụ: 95" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading} block size="large" style={{ borderRadius: '8px' }}>
+              Bắt đầu dự đoán
             </Button>
-          </Space>
-        </Card>
-      </Content>
-      <Footer style={{ textAlign: 'center' }}>Nhóm 9 - Dự đoán kết quả học tập ©2026</Footer>
-    </Layout>
+          </Form.Item>
+        </Form>
+
+        {prediction && (
+          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e6f7ff', borderRadius: '8px', textAlign: 'center' }}>
+            <Title level={4} style={{ margin: 0 }}>Kết quả: {prediction}</Title>
+          </div>
+        )}
+      </Card>
+    </div>
   );
-}
+};
 
 export default App;
