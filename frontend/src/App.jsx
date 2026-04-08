@@ -51,10 +51,13 @@ const App = () => {
         </Form>
 
         {prediction && (
-          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e6f7ff', borderRadius: '8px', textAlign: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>Kết quả: {prediction}</Title>
-          </div>
-        )}
+  <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e6f7ff', borderRadius: '8px' }}>
+    <Title level={4}>Kết quả: {prediction}</Title>
+    {/* Thêm 2 dòng này để hiện đầy đủ dữ liệu từ Backend mới */}
+    <Text strong>Điểm dự kiến: {response.data.predicted_score}</Text> <br/>
+    <Text italic>Lời khuyên: {response.data.advice}</Text>
+  </div>
+)}
       </Card>
     </div>
   );
