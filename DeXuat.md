@@ -1,6 +1,7 @@
 # Đề Xuất Đề Tài BTL - Trí tuệ nhân tạo
 ## 1. Thông tin nhóm
 - Nhóm: 8
+<<<<<<< HEAD
 - Thành viên:
 
 | MSSV       | HỌ VÀ TÊN          |
@@ -9,6 +10,8 @@
 | 2351050195 | Ngô Anh Tuấn       |
 | 2351050024 | Trương Văn Dũng    |
 | 2351050082 | Nguyễn Anh Khoa    |
+=======
+
 - GVHD: ThS.Võ Việt Khoa
 ## 2. Đề tài chọn
 - **Đề tài số:** 9
@@ -26,8 +29,10 @@
 | Thành viên | Công việc chính                      | Timeline |
 | ---------- | ------------------------------------ | -------- |
 | ...        | Notebook/ML / FE / BE / PM / Báo cáo | Tuần …  |
+<<<<<<< HEAD
 |            |                                      |          |
 |            |                                      |          |
+=======
 ## 6. Timeline
 - Tuần 1–2: Khởi động, EDA
 - Tuần 3–4: Preprocessing, Modeling
