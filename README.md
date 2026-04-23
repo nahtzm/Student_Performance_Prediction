@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 86a8655 (change readme.md, dexuat.md)
+
 # FINAL PROJECT ARTIFICIAL INTELLIGENCE - ĐỀ TÀI 9 - STUDENT PERFORMANCE PREDICTION (REGRESSION)
 ## Mô tả 
 Đề tài tập trung vào bài toán **Machine Learning dạng Regression** nhằm dự đoán điểm số cuối kỳ của học sinh dựa trên các yếu tố liên quan đến quá trình học tập và môi trường cá nhân. Dataset được sử dụng là **Student Performance Dataset**, bao gồm các đặc trưng như điểm các kỳ trước, thời gian học, số buổi nghỉ học, số môn trượt và trình độ học vấn của cha mẹ.
@@ -34,9 +31,6 @@ cd frontend && npm install && npm start
 - Screenshot/video: [link hoặc mô tả] 
 ## Nộp bài
 - Báo cáo: report/report.pdf 
-<<<<<<< HEAD
+
 - wandb link: wandb_link.txt
-=======
-=======
-- wandb link: wandb_link.txt
->>>>>>> 86a8655 (change readme.md, dexuat.md)
+

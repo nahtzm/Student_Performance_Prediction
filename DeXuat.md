@@ -1,20 +1,9 @@
 # Đề Xuất Đề Tài BTL - Trí tuệ nhân tạo
 ## 1. Thông tin nhóm
 - Nhóm: 8
-<<<<<<< HEAD
-<<<<<<< HEAD
 - Thành viên:
 
-| MSSV       | HỌ VÀ TÊN          |
-| ---------- | ------------------ |
-| 2351010189 | Nguyễn Bá Thân Tâm |
-| 2351050195 | Ngô Anh Tuấn       |
-| 2351050024 | Trương Văn Dũng    |
-| 2351050082 | Nguyễn Anh Khoa    |
-=======
-=======
-- Thành viên:
->>>>>>> 86a8655 (change readme.md, dexuat.md)
+
 
 | MSSV       | HỌ VÀ TÊN          |
 | ---------- | ------------------ |
@@ -39,15 +28,9 @@
 | Thành viên | Công việc chính                      | Timeline |
 | ---------- | ------------------------------------ | -------- |
 | ...        | Notebook/ML / FE / BE / PM / Báo cáo | Tuần …  |
-<<<<<<< HEAD
-<<<<<<< HEAD
 |            |                                      |          |
 |            |                                      |          |
-=======
-=======
-|            |                                      |          |
-|            |                                      |          |
->>>>>>> 86a8655 (change readme.md, dexuat.md)
+
 ## 6. Timeline
 - Tuần 1–2: Khởi động, EDA
 - Tuần 3–4: Preprocessing, Modeling
