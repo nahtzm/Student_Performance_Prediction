@@ -1,64 +1,140 @@
-import React, { useState } from 'react';
-import { Form, InputNumber, Button, Card, Typography, Select, Space, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, InputNumber, Button, Card, Typography, Table, message, Tag, Row, Col, Select } from 'antd';
 import axios from 'axios';
+import './App.css'; // Import file CSS bên ngoài
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 const App = () => {
   const [loading, setLoading] = useState(false);
-  const [prediction, setPrediction] = useState(null);
+  const [predictionData, setPredictionData] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get('http://127.0.0.1:8000/history');
+      setHistory(res.data);
+    } catch (error) {
+      console.error("Không lấy được lịch sử:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Gửi dữ liệu sang Backend FastAPI
       const response = await axios.post('http://127.0.0.1:8000/predict', values);
-      setPrediction(response.data.prediction);
+      setPredictionData(response.data);
       message.success('Đã dự đoán xong!');
+      fetchHistory(); 
     } catch (error) {
-      message.error('Không kết nối được với Backend!');
+      message.error('Lỗi kết nối Backend!');
     } finally {
       setLoading(false);
     }
   };
 
+  const columns = [
+    { title: 'Giờ học', dataIndex: 'study_hours', key: 'study_hours' },
+    { title: 'Điểm G2', dataIndex: 'previous_score', key: 'previous_score' },
+    { title: 'Vắng', dataIndex: 'attendance', key: 'attendance' },
+    { title: 'Rớt môn', dataIndex: 'failures', key: 'failures' },
+    { 
+      title: 'Kết quả', 
+      dataIndex: 'result', 
+      key: 'result',
+      render: (text) => (
+        <Tag color={text === 'PASS' ? 'green' : 'red'}>{text}</Tag>
+      )
+    },
+    { title: 'Dự đoán', dataIndex: 'score', key: 'score', render: (val) => <b>{val}</b> },
+    { title: 'Ngày thực hiện', dataIndex: 'date', key: 'date' },
+  ];
+
   return (
-    <div style={{ padding: '50px', display: 'flex', justifyContent: 'center', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
-      <Card style={{ width: 500, borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Title level={3} style={{ textAlign: 'center', color: '#1890ff' }}>Dự Đoán Kết Quả Học Tập</Title>
-        <Text type="secondary" style={{ display: 'block', marginBottom: '20px', textAlign: 'center' }}>
-          Nhập thông tin sinh viên để hệ thống AI phân tích
-        </Text>
+    <div className="main-container">
+      <div className="content-wrapper">
+        
+        <Card className="prediction-card">
+          <Title level={3} className="main-title">Hệ Thống Dự Đoán Kết Quả Học Tập</Title>
+          <Text type="secondary" className="sub-title">
+            Nhóm 9 - AI Academic Performance Prediction
+          </Text>
 
-        <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item label="Số giờ học/tuần" name="study_hours" rules={[{ required: true, message: 'Vui lòng nhập số giờ!' }]}>
-            <InputNumber min={0} max={168} style={{ width: '100%' }} placeholder="Ví dụ: 20" />
-          </Form.Item>
+          <Form layout="vertical" onFinish={onFinish} initialValues={{ failures: 0, goout: 3 }}>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item label="Số giờ học/tuần" name="study_hours" rules={[{ required: true }]}>
+                  <InputNumber min={1} max={4} className="full-width" placeholder="Thang 1-4" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Điểm kỳ trước (G2)" name="previous_score" rules={[{ required: true }]}>
+                  <InputNumber min={0} max={20} step={0.5} className="full-width" placeholder="Thang 0-20" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Số buổi vắng" name="attendance" rules={[{ required: true }]}>
+                  <InputNumber min={0} max={93} className="full-width" placeholder="0 - 93" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Form.Item label="Điểm trung bình hiện tại" name="previous_score" rules={[{ required: true, message: 'Vui lòng nhập điểm!' }]}>
-            <InputNumber min={0} max={10} step={0.1} style={{ width: '100%' }} placeholder="Ví dụ: 7.5" />
-          </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Số môn từng rớt" name="failures">
+                  <Select placeholder="Chọn số môn">
+                    <Option value={0}>Chưa từng rớt</Option>
+                    <Option value={1}>1 môn</Option>
+                    <Option value={2}>2 môn</Option>
+                    <Option value={3}>3 môn trở lên</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Mức độ đi chơi" name="goout">
+                  <Select>
+                    <Option value={1}>Rất ít</Option>
+                    <Option value={2}>Ít</Option>
+                    <Option value={3}>Trung bình</Option>
+                    <Option value={4}>Nhiều</Option>
+                    <Option value={5}>Rất nhiều</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Form.Item label="Tỷ lệ chuyên cần (%)" name="attendance" rules={[{ required: true, message: 'Vui lòng nhập tỷ lệ!' }]}>
-            <InputNumber min={0} max={100} style={{ width: '100%' }} placeholder="Ví dụ: 95" />
-          </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading} block size="large" className="submit-btn">
+                Bắt đầu phân tích AI
+              </Button>
+            </Form.Item>
+          </Form>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large" style={{ borderRadius: '8px' }}>
-              Bắt đầu dự đoán
-            </Button>
-          </Form.Item>
-        </Form>
+          {predictionData && (
+            <div className={`result-box ${predictionData.prediction === 'PASS' ? 'pass' : 'fail'}`}>
+              <Title level={4} className="result-status">
+                Kết quả: {predictionData.prediction}
+              </Title>
+              <Text strong className="result-score">Điểm số dự kiến: {predictionData.score}/20</Text> <br/>
+              <Text italic className="result-advice">Lời khuyên: {predictionData.advice}</Text>
+            </div>
+          )}
+        </Card>
 
-        {prediction && (
-  <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e6f7ff', borderRadius: '8px' }}>
-    <Title level={4}>Kết quả: {prediction}</Title>
-    {/* Thêm 2 dòng này để hiện đầy đủ dữ liệu từ Backend mới */}
-    <Text strong>Điểm dự kiến: {response.data.predicted_score}</Text> <br/>
-    <Text italic>Lời khuyên: {response.data.advice}</Text>
-  </div>
-)}
-      </Card>
+        <Card title="Lịch sử dự đoán (Database)" className="history-card">
+          <Table 
+            dataSource={history} 
+            columns={columns} 
+            rowKey="id" 
+            pagination={{ pageSize: 5 }} 
+          />
+        </Card>
+      </div>
     </div>
   );
 };
