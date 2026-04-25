@@ -50,8 +50,7 @@ init_db()
 
 # 4. Cấu hình Model AI
 # Cập nhật đường dẫn trỏ thẳng ra thư mục models ở gốc dự án
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "best_model.pkl")
+MODEL_PATH = "/models/best_model.pkl"
 
 def load_ai_model():
     """Tải model từ file .pkl"""
