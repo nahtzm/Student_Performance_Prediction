@@ -46,24 +46,30 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Gọi hàm khởi tạo DB khi ứng dụng startup
 init_db()
 
 # 4. Cấu hình Model AI
-MODEL_PATH = "notebooks/models/best_model.pkl"
+# Cập nhật đường dẫn trỏ thẳng ra thư mục models ở gốc dự án
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "best_model.pkl")
+
 def load_ai_model():
     """Tải model từ file .pkl"""
     if os.path.exists(MODEL_PATH):
-        return joblib.load(MODEL_PATH)
+        try:
+            return joblib.load(MODEL_PATH)
+        except Exception as e:
+            print(f"Lỗi khi load model: {e}")
+            return None
     return None
 
 # 5. Schema dữ liệu (Sử dụng Pydantic để validate dữ liệu từ Frontend)
 class StudentInput(BaseModel):
-    study_hours: float   # studytime (1-4)
+    study_hours: float    # studytime (1-4)
     previous_score: float # G2 (0-20)
-    attendance: float    # absences (0-93)
-    failures: int        # failures (0-3)
-    goout: int           # goout (1-5)
+    attendance: float     # absences (0-93)
+    failures: int         # failures (0-3)
+    goout: int            # goout (1-5)
 
 # 6. Các Endpoints API
 
@@ -73,7 +79,7 @@ def health_check():
     model_exists = os.path.exists(MODEL_PATH)
     return {
         "status": "Online",
-        "model_status": "Ready" if model_exists else "Model file not found",
+        "model_status": "Ready" if model_exists else "Model file not found at " + MODEL_PATH,
         "database": "Connected",
         "group": "Group 9"
     }
@@ -86,12 +92,12 @@ async def predict(data: StudentInput):
     if not ai_model:
         raise HTTPException(
             status_code=500, 
-            detail="Chưa tìm thấy file model .pkl trong thư mục models/. Vui lòng kiểm tra lại."
+            detail=f"Chưa tìm thấy file model tại {MODEL_PATH}. Vui lòng kiểm tra lại."
         )
 
     try:
-        # TẠO DATAFRAME KHỚP VỚI CẤU TRÚC 30+ CỘT CỦA DATASET GỐC
-        # Các cột không có từ FE sẽ được điền giá trị trung bình/mặc định
+        # Bước 1: Tạo dict với đầy đủ các cột gốc của student-mat.csv (32 cột)
+        # Model Pipeline yêu cầu đúng số lượng và tên cột đầu vào
         input_dict = {
             "school": ["GP"], "sex": ["F"], "age": [17], "address": ["U"],
             "famsize": ["GT3"], "Pstatus": ["T"], "Medu": [2], "Fedu": [2],
@@ -110,11 +116,13 @@ async def predict(data: StudentInput):
             "G2": [data.previous_score]
         }
         
-        # Feature Engineering (Nếu model của bạn được huấn luyện có các cột này)
-        input_dict["study_per_absence"] = [data.study_hours / (data.attendance + 1)]
-        input_dict["failure_impact"] = [data.failures * data.attendance]
-        
+        # Bước 2: Chuyển thành DataFrame với thứ tự cột chuẩn
         df = pd.DataFrame(input_dict)
+        
+        # Bước 3: Feature Engineering (Thêm 2 cột mới khớp với preprocessing.py)
+        # Lưu ý: Thêm vào sau cùng để khớp cấu trúc Pipeline đã train
+        df["study_per_absence"] = df["studytime"] / (df["absences"] + 1)
+        df["failure_impact"] = df["failures"] * df["absences"]
         
         # Thực hiện dự đoán
         prediction_result = ai_model.predict(df)[0]
@@ -134,7 +142,7 @@ async def predict(data: StudentInput):
         else:
             advice = "Cảnh báo: Bạn có nguy cơ không đạt. Hãy tập trung học tập và giảm bớt thời gian đi chơi."
 
-        # LƯU VÀO DATABASE
+        # Bước 4: LƯU VÀO DATABASE
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute('''
@@ -158,7 +166,7 @@ async def predict(data: StudentInput):
 
 @app.get("/history")
 def get_history():
-    """Lấy danh sách 10 lần dự đoán gần nhất để hiển thị lên bảng"""
+    """Lấy danh sách 10 lần dự đoán gần nhất"""
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
