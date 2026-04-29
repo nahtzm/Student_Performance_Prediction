@@ -1,0 +1,27 @@
+{
+  "os":  "Windows-11-10.0.26200-SP0",
+  "python":  "CPython 3.13.11",
+  "startedAt":  "2026-04-29T05:34:25.905515Z",
+  "program":  "notebooks/wandb.ipynb",
+  "codePath":  "notebooks/wandb.ipynb",
+  "git":  {
+    "remote":  "https://github.com/nahtzm/Student_Performance_Prediction.git",
+    "commit":  "c04237b76987598d338b8d0a1f5931e1020e6c1d"
+  },
+  "email":  "2351010189tam@ou.edu.vn",
+  "root":  "T:\\Student_Performance_Prediction\\notebooks",
+  "host":  "Sung-Jin-Woo",
+  "executable":  "T:\\Anaconda\\python.exe",
+  "cpu_count":  6,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "289164750848",
+      "used":  "191738077184"
+    }
+  },
+  "memory":  {
+    "total":  "16516440064"
+  },
+  "writerId":  "2j9ts0iulaikhe1qhju86en6jjhtymuz"
+}
