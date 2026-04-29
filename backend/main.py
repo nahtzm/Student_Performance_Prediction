@@ -49,8 +49,7 @@ def init_db():
 init_db()
 
 # 4. Cấu hình Model AI
-# Cập nhật đường dẫn trỏ thẳng ra thư mục models ở gốc dự án
-MODEL_PATH = "/models/best_model.pkl"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "best_model.pkl")
 
 def load_ai_model():
     """Tải model từ file .pkl"""
@@ -96,7 +95,7 @@ async def predict(data: StudentInput):
 
     try:
         # Bước 1: Tạo dict với đầy đủ các cột gốc của student-mat.csv (32 cột)
-        # Model Pipeline yêu cầu đúng số lượng và tên cột đầu vào
+       
         input_dict = {
             "school": ["GP"], "sex": ["F"], "age": [17], "address": ["U"],
             "famsize": ["GT3"], "Pstatus": ["T"], "Medu": [2], "Fedu": [2],
@@ -119,10 +118,9 @@ async def predict(data: StudentInput):
         df = pd.DataFrame(input_dict)
         
         # Bước 3: Feature Engineering (Thêm 2 cột mới khớp với preprocessing.py)
-        # Lưu ý: Thêm vào sau cùng để khớp cấu trúc Pipeline đã train
         df["study_per_absence"] = df["studytime"] / (df["absences"] + 1)
-        df["failure_impact"] = df["failures"] * df["absences"]
-        
+        df["failure_impact"] = df["failures"] *df["absences"]
+         
         # Thực hiện dự đoán
         prediction_result = ai_model.predict(df)[0]
         

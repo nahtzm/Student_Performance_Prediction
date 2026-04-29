@@ -17,6 +17,6 @@ services:
     build: ./frontend
     container_name: student_performance_frontend
     ports:
-      - "5173:80"  # <--- SỬA DÒNG NÀY (Cổng ngoài:Cổng trong)
+      - "5173:80"  
     depends_on:
       - backend
